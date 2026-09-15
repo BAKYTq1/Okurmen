@@ -172,6 +172,22 @@ async function sendToTelegram(name, mentor, rating, review) {
   }
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Сохранение отзыва локально (localStorage)
+   ───────────────────────────────────────────────────────────────────────── */
+function saveReviewLocally(name, mentor, rating, review) {
+  const reviews = JSON.parse(localStorage.getItem("okurmen_reviews") || "[]");
+  reviews.push({
+    id:        Date.now(),
+    timestamp: new Date().toISOString(),
+    name,
+    mentor,
+    rating,
+    review,
+  });
+  localStorage.setItem("okurmen_reviews", JSON.stringify(reviews));
+}
+
 function escapeHtml(str) {
   return str
     .replace(/&/g, "&amp;")
@@ -199,6 +215,7 @@ form.addEventListener("submit", async (e) => {
 
   try {
     await sendToTelegram(name, mentor, rating, review);
+    saveReviewLocally(name, mentor, rating, review);
     showSuccess();
   } catch (err) {
     console.error(err);
